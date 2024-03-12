@@ -21,22 +21,32 @@ function saveTokenToLocalStorage(token) {
 function getTokenFromLocalStorage() {
     return localStorage.getItem('auth_token');
 }
+
+// Получение токена по api
+async function fetchToken() {
+    try {
+        const data = new FormData();
+        data.append('username', import.meta.env.VITE_VUE_APP_USERNAME);
+        data.append('password', import.meta.env.VITE_VUE_APP_PASSWORD);
+
+        const response = await axios.post(`${baseUrl}/user/token`, data, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+
+        const token = response.data['access_token'];
+        saveTokenToLocalStorage(token);
+        return token;
+    } catch (error) {
+        console.error("Failed to fetch token:", error);
+    }
+}
 async function fetchSegments() {
     try {
-        const token = getTokenFromLocalStorage();
+        let token = getTokenFromLocalStorage();
         if (!token) {
-            // Получение токена авторизации
-            const data = new FormData();
-            data.append('username', import.meta.env.VITE_VUE_APP_USERNAME);
-            data.append('password', import.meta.env.VITE_VUE_APP_PASSWORD);
-            const authResponse = await axios.post(`${baseUrl}/user/token`, data, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-            const token = authResponse.data['access_token'];
-            console.log(token);
-            saveTokenToLocalStorage(token);
+            token = await fetchToken();
         }
 
         // Получение id отчета
