@@ -13,17 +13,17 @@ onMounted(() => {
 });
 
 // Сохранение токена в localStorage
-function saveToken(token) {
+function saveTokenToLocalStorage(token) {
     localStorage.setItem('auth_token', token);
 }
 
 // Получение токена из localStorage
-function getToken() {
+function getTokenFromLocalStorage() {
     return localStorage.getItem('auth_token');
 }
 async function fetchSegments() {
     try {
-        const token = getToken();
+        const token = getTokenFromLocalStorage();
         if (!token) {
             // Получение токена авторизации
             const data = new FormData();
@@ -36,7 +36,7 @@ async function fetchSegments() {
             });
             const token = authResponse.data['access_token'];
             console.log(token);
-            saveToken(token);
+            saveTokenToLocalStorage(token);
         }
 
         // Получение id отчета
