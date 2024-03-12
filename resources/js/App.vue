@@ -12,19 +12,32 @@ onMounted(() => {
     fetchSegments();
 });
 
+// Сохранение токена в localStorage
+function saveToken(token) {
+    localStorage.setItem('auth_token', token);
+}
+
+// Получение токена из localStorage
+function getToken() {
+    return localStorage.getItem('auth_token');
+}
 async function fetchSegments() {
     try {
-        // Получение токена авторизации
-        const data = new FormData();
-        data.append('username', import.meta.env.VITE_VUE_APP_USERNAME);
-        data.append('password', import.meta.env.VITE_VUE_APP_PASSWORD);
-        const authResponse = await axios.post(`${baseUrl}/user/token`, data, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        });
-        const token = authResponse.data['access_token'];
-        console.log(token);
+        const token = getToken();
+        if (!token) {
+            // Получение токена авторизации
+            const data = new FormData();
+            data.append('username', import.meta.env.VITE_VUE_APP_USERNAME);
+            data.append('password', import.meta.env.VITE_VUE_APP_PASSWORD);
+            const authResponse = await axios.post(`${baseUrl}/user/token`, data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            const token = authResponse.data['access_token'];
+            console.log(token);
+            saveToken(token);
+        }
 
         // Получение id отчета
         const reportsResponse = await axios.get(`${baseUrl}/reports`, {
