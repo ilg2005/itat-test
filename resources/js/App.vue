@@ -42,6 +42,21 @@ async function fetchToken() {
         console.error("Failed to fetch token:", error);
     }
 }
+
+// Получение id отчета по api
+async function fetchReportId(token) {
+    try {
+        const reportsResponse = await axios.get(`${baseUrl}/reports`, {
+            headers: {Authorization: `Bearer ${token}`}
+        });
+        const reports = reportsResponse.data.grouped.General;
+        const report = reports.find(report => report.name === "get_segment_rfm");
+        return report.id;
+    } catch (error) {
+        console.error("Failed to fetch report id:", error);
+    }
+}
+
 async function fetchSegments() {
     try {
         let token = getTokenFromLocalStorage();
@@ -49,16 +64,7 @@ async function fetchSegments() {
             token = await fetchToken();
         }
 
-        // Получение id отчета
-        const reportsResponse = await axios.get(`${baseUrl}/reports`, {
-            headers: {Authorization: `Bearer ${token}`}
-        });
-        const reports = reportsResponse.data.grouped.General;
-
-        const report = reports.find(report => report.name === "get_segment_rfm");
-        const reportId = report.id;
-
-        console.log(reportId);
+        const reportId = await fetchReportId(token);
 
         // Получение сегментов
         const segmentsResponse = await axios.post(`${baseUrl}/report/${reportId}/run`, {}, {
