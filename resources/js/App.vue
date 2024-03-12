@@ -75,13 +75,11 @@ async function fetchSegments() {
             }
         });
 
-        console.log(segmentsResponse.data);
-        totalClients.value = segmentsResponse.data.total;
-        console.log(totalClients.value);
         const segmentsData = segmentsResponse.data.aggregations.segments.buckets;
-        console.log(segmentsData);
         segments.value = segmentsData;
 
+        // Подсчет общего количества клиентов по данным из всех сегментов
+        totalClients.value = segmentsData.reduce((total, segment) => total + segment.doc_count, 0);
     } catch (error) {
         console.error("Failed to fetch segments:", error);
     }
