@@ -1,5 +1,5 @@
 <script setup>
-import {ref, onMounted} from 'vue';
+import {ref, onBeforeMount } from 'vue';
 import axios from 'axios';
 import Card from "./components/Card.vue";
 
@@ -10,7 +10,7 @@ const errorMessage = ref('');
 
 const baseUrl = import.meta.env.VITE_VUE_APP_BASE_URL;
 
-onMounted(() => {
+onBeforeMount(() => {
     fetchSegments();
 });
 
@@ -81,6 +81,7 @@ async function fetchSegments() {
 
         const segmentsData = segmentsResponse.data.aggregations.segments.buckets;
         segments.value = segmentsData;
+       // segments.value = [];
 
         // Подсчет общего количества клиентов по данным из всех сегментов
         totalClients.value = segmentsData.reduce((total, segment) => total + segment.doc_count, 0);
@@ -100,13 +101,17 @@ async function fetchSegments() {
         <div v-if="errorMessage" class="text-red-500 font-bold">{{ errorMessage }}</div>
 
         <!-- Отображение сегментов -->
-        <Card
-            v-else
-            v-for="segment in segments"
-              :key="segment.key"
-              :data="segment"
-              :total="totalClients"
-        />
+        <div v-if="!isLoading && segments.length"
+        class="flex flex-wrap">
+            <Card
+                v-for="segment in segments"
+                :key="segment.key"
+                :data="segment"
+                :total="totalClients"
+                class="mr-4 mb-4"
+            />
+        </div>
+        <div v-else class="text-lg font-bold">Сегменты отсутствуют</div>
 
     </div>
 </template>
