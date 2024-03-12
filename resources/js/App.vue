@@ -1,5 +1,5 @@
 <script setup>
-import {ref, onBeforeMount } from 'vue';
+import {ref, onBeforeMount} from 'vue';
 import axios from 'axios';
 import Card from "./components/Card.vue";
 
@@ -81,7 +81,7 @@ async function fetchSegments() {
 
         const segmentsData = segmentsResponse.data.aggregations.segments.buckets;
         segments.value = segmentsData;
-       // segments.value = [];
+        // segments.value = [];
 
         // Подсчет общего количества клиентов по данным из всех сегментов
         totalClients.value = segmentsData.reduce((total, segment) => total + segment.doc_count, 0);
@@ -98,11 +98,11 @@ async function fetchSegments() {
     <div class="container flex flex-wrap justify-center gap-6">
         <!-- Индикатор загрузки -->
         <div v-if="isLoading" class="text-lg font-bold">Загрузка...</div>
-        <div v-if="errorMessage" class="text-red-500 font-bold">{{ errorMessage }}</div>
+        <div v-else-if="errorMessage" class="text-red-500 font-bold">{{ errorMessage }}</div>
 
         <!-- Отображение сегментов -->
-        <div v-if="!isLoading && segments.length"
-        class="flex flex-wrap">
+        <div v-else-if="segments.length"
+             class="flex flex-wrap">
             <Card
                 v-for="segment in segments"
                 :key="segment.key"
