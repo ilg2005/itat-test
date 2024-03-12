@@ -5,7 +5,8 @@ import Card from "./components/Card.vue";
 
 const segments = ref([]);
 const totalClients = ref(0);
-const baseUrl = 'https://vivarolls.magic-of-numbers.ru:8686';
+
+const baseUrl = import.meta.env.VITE_VUE_APP_BASE_URL;
 
 onMounted(() => {
     fetchSegments();
@@ -15,8 +16,8 @@ async function fetchSegments() {
     try {
         // Получение токена авторизации
         const data = new FormData();
-        data.append('username', 'test@com.ru');
-        data.append('password', '!Sdc987gS5d@3');
+        data.append('username', import.meta.env.VITE_VUE_APP_USERNAME);
+        data.append('password', import.meta.env.VITE_VUE_APP_PASSWORD);
         const authResponse = await axios.post(`${baseUrl}/user/token`, data, {
             headers: {
                 'Content-Type': 'multipart/form-data',
