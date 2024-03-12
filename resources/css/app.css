@@ -3,7 +3,9 @@
 @tailwind utilities;
 
 .container {
-    max-width: 1200px;
-    margin: auto;
-    padding: 5rem;
+    @apply max-w-6xl mx-auto mt-10;
+}
+
+.custom {
+    @apply rounded-full px-2 py-1;
 }
