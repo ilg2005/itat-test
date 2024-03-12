@@ -5,6 +5,8 @@ import Card from "./components/Card.vue";
 
 const segments = ref([]);
 const totalClients = ref(0);
+const isLoading = ref(true);
+const errorMessage = ref('');
 
 const baseUrl = import.meta.env.VITE_VUE_APP_BASE_URL;
 
@@ -39,7 +41,7 @@ async function fetchToken() {
         saveTokenToLocalStorage(token);
         return token;
     } catch (error) {
-        console.error("Failed to fetch token:", error);
+        console.log("Failed to fetch token:", error);
     }
 }
 
@@ -57,7 +59,9 @@ async function fetchReportId(token) {
     }
 }
 
+// Получение данных по сегментам
 async function fetchSegments() {
+    isLoading.value = true;
     try {
         let token = getTokenFromLocalStorage();
         if (!token) {
@@ -81,18 +85,29 @@ async function fetchSegments() {
         // Подсчет общего количества клиентов по данным из всех сегментов
         totalClients.value = segmentsData.reduce((total, segment) => total + segment.doc_count, 0);
     } catch (error) {
+        errorMessage.value = 'Ошибка: не удалось получить сегменты!';
         console.error("Failed to fetch segments:", error);
+    } finally {
+        isLoading.value = false;
     }
 }
 </script>
 
 <template>
     <div class="container flex flex-wrap justify-center gap-6">
-        <Card v-for="segment in segments"
+        <!-- Индикатор загрузки -->
+        <div v-if="isLoading" class="text-lg font-bold">Загрузка...</div>
+        <div v-if="errorMessage" class="text-red-500 font-bold">{{ errorMessage }}</div>
+
+        <!-- Отображение сегментов -->
+        <Card
+            v-else
+            v-for="segment in segments"
               :key="segment.key"
               :data="segment"
               :total="totalClients"
         />
+
     </div>
 </template>
 
